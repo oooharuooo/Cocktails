@@ -1,11 +1,44 @@
 import React, { useState, useContext, useEffect } from 'react'
+import axios from 'axios'
 import { useCallback } from 'react'
 
 const url = 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s='
 const AppContext = React.createContext()
 
 const AppProvider = ({ children }) => {
-  return <AppContext.Provider value='hello'>{children}</AppContext.Provider>
+
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("z")
+  const [cocktails, setCocktails] = useState([])
+
+  const fetchDrinks = useCallback(async () => {
+    setLoading(false)
+    try {
+      const {data: {drinks}} = await axios.get(`${url}${searchTerm}`)
+      if (drinks) { 
+        const newCocktails = drinks.map(drink => {
+          const { idDrink, strDrink, strDrinkThumb, strAlcoholic, strGlass } = drink
+          return {id:idDrink,name:strDrink,image:strDrinkThumb,info:strAlcoholic,glass:strGlass}
+        })
+        setCocktails(newCocktails)
+      } else setCocktails([])
+    } catch (err) {
+      console.log(err)
+    }
+  },[searchTerm])
+
+  useEffect(() => {
+    fetchDrinks();
+  },[searchTerm,fetchDrinks])
+  return <AppContext.Provider
+    value={{
+      loading,
+      searchTerm,
+      cocktails,
+      setSearchTerm
+  }}>
+    {children}
+  </AppContext.Provider>
 }
 // make sure use
 export const useGlobalContext = () => {

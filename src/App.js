@@ -9,10 +9,26 @@ import Error from './pages/Error'
 import Navbar from './components/Navbar'
 function App() {
   return (
-    <div>
-      <h2>app component</h2>
-    </div>
-  )
+		<div>
+			<Router>
+				<Navbar />
+				<Switch>
+					<Route exact path="/">
+						<Home />
+					</Route>
+					<Route exact path="/about">
+						<About />
+					</Route>
+					<Route exact path="/cocktail/:id">
+						<SingleCocktail />
+					</Route>
+					<Route exact path="*">
+						<Error />
+					</Route>
+				</Switch>
+			</Router>
+		</div>
+	);
 }
 
 export default App
